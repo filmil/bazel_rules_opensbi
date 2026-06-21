@@ -1,0 +1,14 @@
+/dts-v1/;
+
+/* Compose a board from reusable fragments using cpp #include. */
+#include "soc.dtsi"
+#include "memory.dtsi"
+
+/ {
+    compatible = "example,board";
+    model = "Example Composed Board";
+
+    chosen {
+        stdout-path = "/soc/serial@10000000";
+    };
+};

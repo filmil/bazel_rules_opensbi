@@ -1,0 +1,12 @@
+# The RISC-V toolchain itself lives in the @opensbi_riscv_toolchain repository
+# (fetched by //internal/toolchain:extensions.bzl). This package only exposes
+# the extension source for documentation and bzl_library aggregation.
+
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//visibility:public"])
+
+bzl_library(
+    name = "extensions",
+    srcs = ["extensions.bzl"],
+)

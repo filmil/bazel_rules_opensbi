@@ -1,0 +1,30 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+package(default_visibility = ["//visibility:public"])
+
+bzl_library(
+    name = "rules",
+    srcs = ["rules.bzl"],
+    deps = [
+        "//internal:defines",
+        "//internal:dtb",
+        "//internal:opensbi_firmware",
+        "//internal:opensbi_library",
+        "//internal:opensbi_qemu_test",
+        "//internal:providers",
+    ],
+)
+
+stardoc(
+    name = "gen_rules",
+    out = "gen.rules.md",
+    input = "rules.bzl",
+    deps = [":rules"],
+)
+
+write_source_files(
+    name = "update",
+    files = {"rules.md": ":gen_rules"},
+)

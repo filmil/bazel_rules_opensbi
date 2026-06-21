@@ -1,0 +1,78 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+package(default_visibility = ["//visibility:public"])
+
+bzl_library(
+    name = "providers",
+    srcs = ["providers.bzl"],
+)
+
+bzl_library(
+    name = "defines",
+    srcs = ["defines.bzl"],
+)
+
+bzl_library(
+    name = "common",
+    srcs = ["common.bzl"],
+)
+
+bzl_library(
+    name = "opensbi_library",
+    srcs = ["opensbi_library.bzl"],
+    deps = [
+        ":common",
+        ":defines",
+        ":providers",
+    ],
+)
+
+bzl_library(
+    name = "opensbi_firmware",
+    srcs = ["opensbi_firmware.bzl"],
+    deps = [
+        ":common",
+        ":defines",
+        ":providers",
+    ],
+)
+
+bzl_library(
+    name = "dtb",
+    srcs = ["dtb.bzl"],
+    deps = [":common"],
+)
+
+bzl_library(
+    name = "opensbi_qemu_test",
+    srcs = ["opensbi_qemu_test.bzl"],
+    deps = [":providers"],
+)
+
+# ---- Generated API documentation ----
+
+_DOCS = {
+    "opensbi_library": "opensbi_library.bzl",
+    "opensbi_firmware": "opensbi_firmware.bzl",
+    "dtb": "dtb.bzl",
+    "opensbi_qemu_test": "opensbi_qemu_test.bzl",
+    "providers": "providers.bzl",
+    "defines": "defines.bzl",
+}
+
+[
+    stardoc(
+        name = "gen_" + n,
+        out = "gen." + n + ".md",
+        input = src,
+        deps = [":" + n],
+    )
+    for n, src in _DOCS.items()
+]
+
+write_source_files(
+    name = "update",
+    files = {n + ".md": ":gen_" + n for n in _DOCS},
+)

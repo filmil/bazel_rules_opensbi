@@ -1,0 +1,49 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dtc and QEMU
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq device-tree-compiler qemu-system-misc rsync
+
+      - name: Setup bazel
+        uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      - name: Build the rules
+        run: bazel build //...
+
+      - name: Regenerate docs and verify they are up to date
+        run: |
+          bazel run //:update
+          git diff --exit-code
+
+      - name: Prepare the opensbi overlay (pristine source + overlay)
+        run: |
+          git clone --depth 1 --branch v1.6 \
+            https://github.com/riscv-software-src/opensbi.git /tmp/opensbi-src
+          mkdir -p /tmp/opensbi-overlaid
+          rsync -a --exclude='.git' /tmp/opensbi-src/ /tmp/opensbi-overlaid/
+          cp -rf overlay/* /tmp/opensbi-overlaid/
+
+      - name: Build and boot-test the integration examples
+        working-directory: integration
+        run: |
+          bazel build  --override_module=opensbi=/tmp/opensbi-overlaid //...
+          bazel test   --override_module=opensbi=/tmp/opensbi-overlaid \
+            --test_output=errors //...

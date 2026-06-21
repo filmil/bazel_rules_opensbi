@@ -1,0 +1,93 @@
+load("@rules_opensbi//build/opensbi:rules.bzl", "opensbi_firmware", "opensbi_qemu_test")
+
+package(default_visibility = ["//visibility:public"])
+
+# Firmware entry sources/scripts and the platform library, exported by the
+# opensbi overlay module and reused by the custom firmwares below.
+_FW_TEXTUAL_HDRS = [
+    "@opensbi//:firmware/fw_base.S",
+    "@opensbi//:firmware/fw_base.ldS",
+]
+
+# ---------------------------------------------------------------------------
+# Inclusion examples: consume the prebuilt firmware from the opensbi module.
+# ---------------------------------------------------------------------------
+
+# Example 6: depend on the overlay module and reuse its fw_dynamic image.
+alias(
+    name = "fw_dynamic",
+    actual = "@opensbi//:fw_dynamic",
+)
+
+# Example 7: likewise for fw_jump.
+alias(
+    name = "fw_jump",
+    actual = "@opensbi//:fw_jump",
+)
+
+# ---------------------------------------------------------------------------
+# Customisation examples: re-link firmware against the overlay's libraries.
+# ---------------------------------------------------------------------------
+
+# Example 8: pin the firmware to a fixed load address (FW_TEXT_START).
+opensbi_firmware(
+    name = "fw_dynamic_reloc",
+    fw_src = "@opensbi//:firmware/fw_dynamic.S",
+    fw_type = "dynamic",
+    lib = "@opensbi//:generic",
+    linker_script = "@opensbi//:firmware/fw_dynamic.elf.ldS",
+    text_start = "0x80000000",
+    textual_hdrs = _FW_TEXTUAL_HDRS,
+)
+
+# Example 9: a payload firmware that embeds a next-stage binary.
+opensbi_firmware(
+    name = "fw_payload_loop",
+    fw_src = "@opensbi//:firmware/fw_payload.S",
+    fw_type = "payload",
+    lib = "@opensbi//:generic",
+    linker_script = "@opensbi//:firmware/fw_payload.elf.ldS",
+    payload = "//examples/payload:loop.bin",
+    textual_hdrs = _FW_TEXTUAL_HDRS,
+)
+
+# Example 10: a payload firmware that also embeds a flattened device tree.
+opensbi_firmware(
+    name = "fw_payload_with_dtb",
+    fdt = "//examples/devicetree:virt",
+    fw_src = "@opensbi//:firmware/fw_payload.S",
+    fw_type = "payload",
+    lib = "@opensbi//:generic",
+    linker_script = "@opensbi//:firmware/fw_payload.elf.ldS",
+    payload = "//examples/payload:loop.bin",
+    textual_hdrs = _FW_TEXTUAL_HDRS,
+)
+
+# ---------------------------------------------------------------------------
+# QEMU boot smoke tests (examples 11-15): boot each image and check the banner.
+# ---------------------------------------------------------------------------
+
+opensbi_qemu_test(
+    name = "fw_dynamic_boot_test",
+    firmware = "@opensbi//:fw_dynamic",
+)
+
+opensbi_qemu_test(
+    name = "fw_jump_boot_test",
+    firmware = "@opensbi//:fw_jump",
+)
+
+opensbi_qemu_test(
+    name = "fw_dynamic_reloc_boot_test",
+    firmware = ":fw_dynamic_reloc",
+)
+
+opensbi_qemu_test(
+    name = "fw_payload_loop_boot_test",
+    firmware = ":fw_payload_loop",
+)
+
+opensbi_qemu_test(
+    name = "fw_payload_with_dtb_boot_test",
+    firmware = ":fw_payload_with_dtb",
+)

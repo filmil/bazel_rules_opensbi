@@ -1,0 +1,22 @@
+/dts-v1/;
+
+/* The preprocessor runs before dtc, so #define macros work in values. */
+#define UART_CLOCK_HZ 3686400
+#define RAM_SIZE      0x08000000
+
+/ {
+    compatible = "example,defines";
+    #address-cells = <2>;
+    #size-cells = <2>;
+
+    serial@10000000 {
+        compatible = "ns16550a";
+        reg = <0x0 0x10000000 0x0 0x100>;
+        clock-frequency = <UART_CLOCK_HZ>;
+    };
+
+    memory@80000000 {
+        device_type = "memory";
+        reg = <0x0 0x80000000 0x0 RAM_SIZE>;
+    };
+};

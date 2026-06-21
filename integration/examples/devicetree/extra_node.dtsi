@@ -1,0 +1,7 @@
+/* Included with dtc's own /include/ directive (not the C preprocessor). */
+/ {
+    extra-device {
+        compatible = "example,extra";
+        status = "okay";
+    };
+};

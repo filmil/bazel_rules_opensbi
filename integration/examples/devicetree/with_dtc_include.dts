@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/ {
+    compatible = "example,dtc-include";
+    model = "Example dtc /include/ Board";
+    #address-cells = <2>;
+    #size-cells = <2>;
+};
+
+/* dtc-level include (resolved by dtc using its -i include path). */
+/include/ "extra_node.dtsi"

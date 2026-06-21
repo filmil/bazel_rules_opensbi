@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/ {
+    compatible = "example,simple";
+    model = "Example Simple Board";
+    #address-cells = <2>;
+    #size-cells = <2>;
+
+    chosen {
+    };
+};

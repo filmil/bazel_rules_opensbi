@@ -1,0 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
+# A minimal next-stage payload (a RISC-V spin loop) embedded by fw_payload
+# examples. Real deployments would point this at a Linux/U-Boot binary.
+exports_files(["loop.bin"])

@@ -1,0 +1,17 @@
+module(
+    name = "integration",
+    version = "0.0.0",
+    bazel_compatibility = [">=8.0.0"],
+)
+
+# The rules under test, taken from the parent repository.
+bazel_dep(name = "rules_opensbi", version = "0.0.0")
+local_path_override(
+    module_name = "rules_opensbi",
+    path = "..",
+)
+
+# The OpenSBI sources, consumed as an overlay module from the registry. For
+# local development before publication, override on the command line:
+#   bazel build --override_module=opensbi=../local/opensbi-overlaid //...
+bazel_dep(name = "opensbi", version = "1.6")

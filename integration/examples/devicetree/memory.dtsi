@@ -1,0 +1,7 @@
+/* A reusable memory fragment, pulled in via the C preprocessor (#include). */
+/ {
+    memory@80000000 {
+        device_type = "memory";
+        reg = <0x0 0x80000000 0x0 0x08000000>;
+    };
+};

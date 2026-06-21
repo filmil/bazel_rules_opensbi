@@ -1,0 +1,39 @@
+load("@rules_opensbi//build/opensbi:rules.bzl", "dtb")
+
+package(default_visibility = ["//visibility:public"])
+
+# Example 1: a single, self-contained device tree source.
+dtb(
+    name = "simple",
+    src = "simple.dts",
+)
+
+# Example 2: a board composed from reusable fragments via the C preprocessor
+# (#include "soc.dtsi" / "memory.dtsi").
+dtb(
+    name = "board",
+    src = "board.dts",
+    includes = [
+        "memory.dtsi",
+        "soc.dtsi",
+    ],
+)
+
+# Example 3: preprocessor #define macros used inside device tree values.
+dtb(
+    name = "with_defines",
+    src = "with_defines.dts",
+)
+
+# Example 4: dtc's own /include/ directive (resolved by dtc, not cpp).
+dtb(
+    name = "with_dtc_include",
+    src = "with_dtc_include.dts",
+    includes = ["extra_node.dtsi"],
+)
+
+# Example 5: a QEMU 'virt'-like tree, reused below to embed into firmware.
+dtb(
+    name = "virt",
+    src = "virt.dts",
+)

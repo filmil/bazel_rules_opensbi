@@ -1,0 +1,18 @@
+/* A reusable SoC fragment, pulled in via the C preprocessor (#include). */
+/ {
+    #address-cells = <2>;
+    #size-cells = <2>;
+
+    soc {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        compatible = "simple-bus";
+        ranges;
+
+        uart0: serial@10000000 {
+            compatible = "ns16550a";
+            reg = <0x0 0x10000000 0x0 0x100>;
+            clock-frequency = <3686400>;
+        };
+    };
+};

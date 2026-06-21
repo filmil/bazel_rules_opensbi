@@ -1,0 +1,30 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+buildifier(name = "buildifier")
+
+bzl_library(
+    name = "doc",
+    srcs = ["doc.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["//build/opensbi:rules"],
+)
+
+stardoc(
+    name = "gen_doc",
+    out = "gen.doc.md",
+    input = "doc.bzl",
+    deps = [":doc"],
+)
+
+# `bazel run //:update` regenerates every committed .md doc in the repository.
+write_source_files(
+    name = "update",
+    additional_update_targets = [
+        "//internal:update",
+        "//build/opensbi:update",
+    ],
+    files = {"doc.md": ":gen_doc"},
+)
