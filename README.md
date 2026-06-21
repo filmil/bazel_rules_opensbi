@@ -93,7 +93,7 @@ consumes these rules and contains 15 worked examples:
 ```sh
 cd integration
 bazel build //...
-bazel test  //...   # requires dtc + qemu-system-riscv64 on PATH
+bazel test  //...   # builds dtbs and boots images; dtc and QEMU are hermetic
 ```
 
 ## How it works
@@ -108,9 +108,11 @@ bazel test  //...   # requires dtc + qemu-system-riscv64 on PATH
   `opensbi` overlay commits the generated `autoconf.h` and the `*.carray.c`
   driver-registration tables for the upstream `generic` defconfig. This keeps
   the build free of configuration scripts.
-* **System `dtc` and QEMU.** The `dtb` rule and `opensbi_qemu_test` use the
-  host's `dtc` and `qemu-system-riscv64` (override with `dtc_path` / `qemu_path`).
-  Install them with `apt-get install device-tree-compiler qemu-system-misc`.
+* **Hermetic `dtc` and QEMU.** The `dtb` rule uses `@dtc//:dtc` (the `dtc` Bazel
+  module, built from source with hermetic flex/bison), and `opensbi_qemu_test`
+  uses the relocatable xPack `qemu-system-riscv64` fetched by a module extension
+  and carried in the test's runfiles. No system packages are required — a clean
+  machine with only Bazel can build and boot-test the firmware.
 
 ## Registries
 

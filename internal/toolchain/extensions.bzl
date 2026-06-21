@@ -54,3 +54,41 @@ riscv_toolchain = module_extension(
     implementation = _riscv_toolchain_impl,
     doc = "Fetches the pinned kernel.org riscv64-linux GCC toolchain.",
 )
+
+# ---------------------------------------------------------------------------
+# Hermetic QEMU (xPack qemu-riscv) for the opensbi_qemu_test boot smoke test.
+# ---------------------------------------------------------------------------
+
+_QEMU_VERSION = "9.2.4-1"
+_QEMU_URL = "https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/download/v{v}/xpack-qemu-riscv-{v}-linux-x64.tar.gz".format(v = _QEMU_VERSION)
+_QEMU_INTEGRITY = "sha256-fNaSd9zzK7AkNR6iJdVJV3cTMCzFFBREutEoNtWWe4w="
+_QEMU_STRIP_PREFIX = "xpack-qemu-riscv-{v}".format(v = _QEMU_VERSION)
+
+# The whole relocatable tree is exposed as ``all`` (test runfiles) so the
+# qemu-system-riscv64 binary can find its bundled libraries via its
+# $ORIGIN-relative rpath. ``qemu_bin`` names the system emulator.
+_QEMU_BUILD_FILE = """\
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all",
+    srcs = glob(["**"], exclude = ["**/*.html", "**/*.pdf"]),
+)
+
+filegroup(name = "qemu_bin", srcs = ["bin/qemu-system-riscv64"])
+"""
+
+def _qemu_impl(module_ctx):
+    http_archive(
+        name = "opensbi_qemu",
+        url = _QEMU_URL,
+        integrity = _QEMU_INTEGRITY,
+        strip_prefix = _QEMU_STRIP_PREFIX,
+        build_file_content = _QEMU_BUILD_FILE,
+    )
+    return module_ctx.extension_metadata(reproducible = True)
+
+qemu = module_extension(
+    implementation = _qemu_impl,
+    doc = "Fetches the pinned xPack qemu-riscv (qemu-system-riscv64).",
+)
