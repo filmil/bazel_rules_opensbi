@@ -1,9 +1,9 @@
 """`opensbi_qemu_test`: boots a firmware image under QEMU and checks the banner.
 
 This is an end-to-end smoke test: it runs `qemu-system-riscv64 -bios <fw.bin>`
-and asserts the OpenSBI banner appears on the serial console. QEMU is taken from
-the host (override with `qemu_path`); the test is skipped by BCR presubmit, which
-only builds artifacts.
+and asserts the OpenSBI banner appears on the serial console. QEMU is hermetic
+(the xPack qemu-riscv build, fetched by the `qemu` module extension and carried
+in the test's runfiles), so no system QEMU is required.
 """
 
 load(":providers.bzl", "OpenSbiFirmwareInfo")
@@ -35,7 +35,7 @@ def _opensbi_qemu_test_impl(ctx):
         output = script,
         content = _SCRIPT.format(
             bin = bin.short_path,
-            qemu = ctx.attr.qemu_path,
+            qemu = ctx.file._qemu.short_path,
             machine = ctx.attr.machine,
             timeout = ctx.attr.timeout_seconds,
             needle = ctx.attr.expect,
@@ -44,13 +44,13 @@ def _opensbi_qemu_test_impl(ctx):
     )
     return [DefaultInfo(
         executable = script,
-        runfiles = ctx.runfiles(files = [bin]),
+        runfiles = ctx.runfiles(files = [bin] + ctx.files._qemu_files),
     )]
 
 opensbi_qemu_test = rule(
     implementation = _opensbi_qemu_test_impl,
     test = True,
-    doc = "Boots an opensbi_firmware image under QEMU and asserts the banner prints.",
+    doc = "Boots an opensbi_firmware image under the hermetic QEMU and asserts the banner prints.",
     attrs = {
         "firmware": attr.label(
             mandatory = True,
@@ -59,7 +59,15 @@ opensbi_qemu_test = rule(
         ),
         "machine": attr.string(default = "virt", doc = "QEMU -machine value."),
         "expect": attr.string(default = "OpenSBI", doc = "Substring to require in QEMU output."),
-        "qemu_path": attr.string(default = "qemu-system-riscv64", doc = "Path to the QEMU binary."),
         "timeout_seconds": attr.int(default = 15, doc = "Seconds before QEMU is killed."),
+        "_qemu": attr.label(
+            default = "@opensbi_qemu//:qemu_bin",
+            allow_single_file = True,
+            doc = "The hermetic qemu-system-riscv64 binary.",
+        ),
+        "_qemu_files": attr.label(
+            default = "@opensbi_qemu//:all",
+            doc = "The full QEMU tree (carried in runfiles for the binary's rpath).",
+        ),
     },
 )

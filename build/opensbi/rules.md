@@ -21,7 +21,7 @@ load("@rules_opensbi//build/opensbi:rules.bzl",
 <pre>
 load("@rules_opensbi//build/opensbi:rules.bzl", "dtb")
 
-dtb(<a href="#dtb-name">name</a>, <a href="#dtb-src">src</a>, <a href="#dtb-dtc_path">dtc_path</a>, <a href="#dtb-includes">includes</a>)
+dtb(<a href="#dtb-name">name</a>, <a href="#dtb-src">src</a>, <a href="#dtb-includes">includes</a>)
 </pre>
 
 Compiles a device tree source (.dts) into a flattened blob (.dtb).
@@ -33,7 +33,6 @@ Compiles a device tree source (.dts) into a flattened blob (.dtb).
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="dtb-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
 | <a id="dtb-src"></a>src |  The device tree source.   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
-| <a id="dtb-dtc_path"></a>dtc_path |  Path to the device tree compiler.   | String | optional |  `"dtc"`  |
 | <a id="dtb-includes"></a>includes |  Included .dtsi/.h fragments.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 
 
@@ -129,10 +128,10 @@ library, and a firmware links the transitive closure of archives.
 <pre>
 load("@rules_opensbi//build/opensbi:rules.bzl", "opensbi_qemu_test")
 
-opensbi_qemu_test(<a href="#opensbi_qemu_test-name">name</a>, <a href="#opensbi_qemu_test-expect">expect</a>, <a href="#opensbi_qemu_test-firmware">firmware</a>, <a href="#opensbi_qemu_test-machine">machine</a>, <a href="#opensbi_qemu_test-qemu_path">qemu_path</a>, <a href="#opensbi_qemu_test-timeout_seconds">timeout_seconds</a>)
+opensbi_qemu_test(<a href="#opensbi_qemu_test-name">name</a>, <a href="#opensbi_qemu_test-expect">expect</a>, <a href="#opensbi_qemu_test-firmware">firmware</a>, <a href="#opensbi_qemu_test-machine">machine</a>, <a href="#opensbi_qemu_test-timeout_seconds">timeout_seconds</a>)
 </pre>
 
-Boots an opensbi_firmware image under QEMU and asserts the banner prints.
+Boots an opensbi_firmware image under the hermetic QEMU and asserts the banner prints.
 
 **ATTRIBUTES**
 
@@ -143,7 +142,6 @@ Boots an opensbi_firmware image under QEMU and asserts the banner prints.
 | <a id="opensbi_qemu_test-expect"></a>expect |  Substring to require in QEMU output.   | String | optional |  `"OpenSBI"`  |
 | <a id="opensbi_qemu_test-firmware"></a>firmware |  The opensbi_firmware target to boot.   | <a href="https://bazel.build/concepts/labels">Label</a> | required |  |
 | <a id="opensbi_qemu_test-machine"></a>machine |  QEMU -machine value.   | String | optional |  `"virt"`  |
-| <a id="opensbi_qemu_test-qemu_path"></a>qemu_path |  Path to the QEMU binary.   | String | optional |  `"qemu-system-riscv64"`  |
 | <a id="opensbi_qemu_test-timeout_seconds"></a>timeout_seconds |  Seconds before QEMU is killed.   | Integer | optional |  `15`  |
 
 
