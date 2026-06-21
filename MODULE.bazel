@@ -15,6 +15,10 @@ bazel_dep(name = "dtc", version = "1.7.2.bcr.1")
 # this module, so they are dev dependencies and are stripped for downstream
 # consumers (and BCR presubmit).
 bazel_dep(name = "stardoc", version = "0.8.1", dev_dependency = True)
+
+# Pin protobuf (pulled in by stardoc) so the prebuilt protoc toolchain is used
+# instead of compiling protoc from source. See the matching flags in .bazelrc.
+bazel_dep(name = "protobuf", version = "35.1", dev_dependency = True)
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5", dev_dependency = True)
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2", dev_dependency = True)
 
