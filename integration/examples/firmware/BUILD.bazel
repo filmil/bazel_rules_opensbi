@@ -69,25 +69,30 @@ opensbi_firmware(
 
 opensbi_qemu_test(
     name = "fw_dynamic_boot_test",
+    size = "small",
     firmware = "@opensbi//:fw_dynamic",
 )
 
 opensbi_qemu_test(
     name = "fw_jump_boot_test",
+    size = "small",
     firmware = "@opensbi//:fw_jump",
 )
 
 opensbi_qemu_test(
     name = "fw_dynamic_reloc_boot_test",
+    size = "small",
     firmware = ":fw_dynamic_reloc",
 )
 
 opensbi_qemu_test(
     name = "fw_payload_loop_boot_test",
+    size = "small",
     firmware = ":fw_payload_loop",
 )
 
 opensbi_qemu_test(
     name = "fw_payload_with_dtb_boot_test",
+    size = "small",
     firmware = ":fw_payload_with_dtb",
 )
